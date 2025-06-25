@@ -97,15 +97,22 @@ include <Utils.scad>
 // Everything is specified in inches;
 // Rendering is as fast as preview now
 scale([25.4, 25.4, 25.4]) render() {
-    make_outer_plate(pin=true);
-    ty(CH_PLATE_HGT+.25) make_outer_plate(pin=false);
-
-    tx(2*CH_PITCH) {
-        make_inner_plate(bush=true);
-        ty(CH_PLATE_HGT+.25) make_inner_plate(bush=false);
+    if (ARRANGEMENT == "Flat" || ARRANGEMENT=="Outer+Pin") {
+        make_outer_plate(pin=true);
+        ty(CH_PLATE_HGT+.25) make_outer_plate(pin=false);
     }
-        //tx(3.5*CH_PITCH+.25) make_axle(CH_ROLLER_ID, CH_ROLLER_OD, CH_ROLLER_WID, false);
-        //tx(4.5*CH_PITCH+.25) make_axle(CH_ROLLER_ID, CH_ROLLER_OD, CH_ROLLER_WID, false);
+
+    if (ARRANGEMENT == "Flat" || ARRANGEMENT=="Inner+Bush") {
+        tx(2*CH_PITCH) {
+            make_inner_plate(bush=true);
+            ty(CH_PLATE_HGT+.25) make_inner_plate(bush=false);
+        }
+    }
+
+    if(ARRANGEMENT == "Flat" || ARRANGEMENT=="Roller") {
+        tx(3.5*CH_PITCH+.25) make_axle(CH_ROLLER_ID, CH_ROLLER_OD, CH_ROLLER_WID, false);
+        tx(4.5*CH_PITCH+.25) make_axle(CH_ROLLER_ID, CH_ROLLER_OD, CH_ROLLER_WID, false);
+    }
 }
 
 module make_outer_plate(pin=true, hue=300, a=1) {
@@ -148,7 +155,7 @@ module make_inner_plate(bush=true, hue=300, a=1) {
         for (x = [CH_PITCH/2, -CH_PITCH/2 ]) {
             tx(x)
                 color("white")
-                cylinder(d=CH_BUSH_OD-GAP, h=CH_PLATE_TH);
+                cylinder(d=(bush)?CH_BUSH_ID:CH_BUSH_OD-GAP, h=CH_PLATE_TH);
         }
     }
 }
